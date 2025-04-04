@@ -1,0 +1,16 @@
+---
+title: "Kuan-Ling Tseng (Rebecca)"
+image: "./pic/IMG_0205 2.jpg"
+about: 
+  template: jolla
+  links: 
+    - icon: envelope
+      href: mailto:kuanlingtseng12@gmail.com
+    - icon: linkedin
+      href: https://www.linkedin.com/in/kuan-ling-tseng-rebecca
+    - icon: github
+      href: https://github.com/rsm-k5tseng
+---
+
+Here is a paragraph about me.
+

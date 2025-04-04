@@ -1,0 +1,5 @@
+---
+title: "Resume"
+---
+{{< pdf ./pdf/Kuan-Ling_Tseng_Resume.pdf width=100% height=800 >}}
+About this site
