@@ -10,13 +10,14 @@ callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
 
 Dean Karlan at Yale and John List at the University of Chicago conducted a field experiment to test the effectiveness of different fundraising letters. They sent out 50,000 fundraising letters to potential donors, randomly assigning each letter to one of three treatments: a standard letter, a matching grant letter, or a challenge grant letter. They published the results of this experiment in the _American Economic Review_ in 2007. The article and supporting data are available from the [AEA website](https://www.aeaweb.org/articles?id=10.1257/aer.97.5.1774) and from Innovations for Poverty Action as part of [Harvard's Dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27853&version=4.2).
 
-In the experiment, the authors collaborated with a nonprofit organization and conducted a large-scale field experiment involving over 50,000 prior donors. Each donor was randomly assigned to receive one of several types of direct-mail fundraising letters.
+The experiment collaborated with a nonprofit organization involving over 50,000 prior donors. Each donor was randomly assigned to receive one of several types of direct-mail fundraising letters.
 
-The control group received a standard letter with no match offer, while the treatment groups received a matching grant offer, where an anonymous donor pledged to match donations at a rate of 1:1, 2:1, or 3:1. Additionally, the letters varied in their presentation of the suggested donation amount and the total match cap ($25,000 / $50,000 / $100,000 / unstated).
+The control group received a standard letter with no match offer, while the treatment groups received a matching grant offer, where an anonymous donor pledged to match donations at a rate of **1:1, 2:1, or 3:1**. Additionally, the letters varied in their presentation of the suggested donation amount and the total match maximum **($25,000 / $50,000 / $100,000 / unstated)**.
 
 The researchers then tracked each recipient’s response—specifically:
-•	Whether they donated at all (gave)
-•	How much they donated (amount)
+
++ Whether they donated at all (gave)
++ How much they donated (amount)
 
 This allowed the authors to examine whether matching grants increase donations, whether the size of the match ratio matters, and how the differences influence donor behavior.
 
@@ -25,20 +26,32 @@ This project seeks to replicate their results.
 ## Data
 
 ### Description
+
+The dataset contains 51 columns, with 50,083 rows (mails sent). There are 33,396 mails sent to the treatment group, while 16,687 mails sent to the control group. As for the match ratio, 11,133 mails got 1:1, 11,134 mails got 2:1, and 11,129 mails got 3:1.
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 import pandas as pd
 
 df = pd.read_stata(
     "/Users/rebeccatseng/Downloads/Rebecca_marketing_analytics/data/karlan_list_2007.dta",
     iterator=False,
 )
+print(f"Rows: {df.shape[0]:,}, Columns: {df.shape[1]:,}")
+print(f"Treatment group: {df.treatment.sum():,}, Contol group: {df.control.sum():,}")
+print(
+    f"Ratio 1:1: {sum(df.ratio == 1):,}, Ratio 2:1: {sum(df.ratio2 == 1):,}, Ratio 3:1: {sum(df.ratio3 == 1):,}"
+)
 df.head()
 ```
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 df.describe()
 ```
-
 
 :::: {.callout-note collapse="true"}
 ### Variable Definitions
@@ -104,7 +117,13 @@ df.describe()
 
 As an ad hoc test of the randomization mechanism, I provide a series of tests that compare aspects of the treatment and control groups to assess whether they are statistically significantly different from one another.
 
+Selected Variables:`hpa`, `mrm2`, `freq`, `years`, `year5`, `dormant`
+
+For the selected variables, I did **T-test** and **regression** to examine the difference between two groups - control group and treatment group.
+
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
 
 from sklearn import linear_model
 import numpy as np
@@ -133,7 +152,7 @@ def compare_ttest_regress(variable):
     reg.fit(X, y)
     reg_result = round(reg.coef_[0] / se, 2)
 
-    return ttest_result, reg_result
+    return treat.mean(), control.mean(), mean_diff, ttest_result, reg_result
 
 
 results = []
@@ -141,15 +160,23 @@ for v in test_variables:
     results.append(
         {
             "variable": v,
-            "t_test": compare_ttest_regress(v)[0],
-            "regress": compare_ttest_regress(v)[1],
+            "control mean": compare_ttest_regress(v)[0],
+            "treatment mean": compare_ttest_regress(v)[1],
+            "difference": compare_ttest_regress(v)[2],
+            "t_test": compare_ttest_regress(v)[3],
+            "regress": compare_ttest_regress(v)[4],
         }
     )
+
+pd.set_option("display.float_format", "{:.2f}".format)
 
 df_result = pd.DataFrame(results)
 df_result
 ```
 
+Across all selected variables, the differences between treatment and control groups are small. The t-test statistics and the regression coefficients for all variables are also small, indicating that the differences between the two groups are not statistically significant.
+
+There is no evidence that there are selecting bias existing, which supports the validity of the experimental design and suggests that the selection was successfully random.
 
 ## Experimental Results
 
@@ -158,6 +185,9 @@ df_result
 First, I analyze whether matched donations lead to an increased response rate of making a donation. 
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 import matplotlib.pyplot as plt
 
 
@@ -168,7 +198,7 @@ control_prop = df_control["gave"].value_counts(normalize=True)
 
 fig, ax = plt.subplots()
 bars = ax.bar(
-    ["treat", "control"],
+    ["treatment", "control"],
     [treat_prop[1] * 100, control_prop[1] * 100],
     color=["skyblue", "orange"],
 )
@@ -188,6 +218,9 @@ for bar in bars:
 ```
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 treat = df[df["treatment"] == 1]["gave"]
 control = df[df["treatment"] == 0]["gave"]
 # t-test
@@ -197,27 +230,33 @@ var_control = control.var(ddof=1)
 se = np.sqrt(var_treat / len(treat) + var_control / len(control))
 t_stat = mean_diff / se
 ttest_result = round(t_stat, 2)
-ttest_result
+print(f"T-test result: {ttest_result}")
 ```
 
 Since the t-test result is so large, we can conclude that the treatment group is significantly more willing to donate than the control group.
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 # regression
 X = df["treatment"].values.reshape(-1, 1)
 y = df["gave"].values
 reg = linear_model.LinearRegression()
 reg.fit(X, y)
 reg_result = round(reg.coef_[0] / se, 2)
-reg_result
+print(f"Regression result: {reg_result}")
 ```
 
 According to the linear regression model, the coefficient is so big that we can conclude that the treatment group is more likely to donate than the control group.
 
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 import statsmodels.api as sm
-import statsmodels.formula.api as smf
+from statsmodels.discrete.discrete_model import Probit
 
 df_clean = df[["gave", "treatment"]].dropna()
 
@@ -229,15 +268,20 @@ print(probit_model.summary())
 
 mfx = probit_model.get_margeff()
 print(mfx.summary())
-```
+``` 
 
-Based on the probit regression result, people in the treatment group are significantly more inclined to donate money.
+The probit regression results also align with the t-test and regression results. It indicates that the treatment group has a statistically significant effect on the willingness of donating. The marginal effect of treatment is about 0.0043, meaning the treatment increases the probability of donation by approximately 0.43%.
+
+The z-score is 3.104 with a p-value of 0.002, providing strong evidence that the difference is not due to random chance, further supports the conclusion that matched donations significantly increase donor participation.
 
 ### Differences between Match Rates
 
 Next, I assess the effectiveness of different sizes of matched donations on the response rate.
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 from scipy import stats
 
 ratio1 = df.query("ratio==1")["gave"]
@@ -277,6 +321,9 @@ print(
 The results show that there are no significant difference between match ratios, 1:1 vs 2:1, 2:1 vs 3:1, or 1:1 vs 3:1.
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 X = df[["ratio2", "ratio3"]]
 X = sm.add_constant(X)
 y = df["gave"]
@@ -287,6 +334,9 @@ print(model.summary())
 
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 ratio1_mean = df.query("(ratio2 == 0) & (ratio3 == 0)")["gave"].mean()
 ratio2_mean = df.query("ratio2==1")["gave"].mean()
 ratio3_mean = df.query("ratio3==1")["gave"].mean()
@@ -308,6 +358,9 @@ In this subsection, I analyze the effect of the size of matched donation on the 
 
 T-test
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 treat_amount = df.query("treatment == 1")["amount"]
 control_amount = df.query("control == 1")["amount"]
 print(
@@ -317,6 +370,9 @@ print(
 
 Linear Regression
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 X = sm.add_constant(df["treatment"])
 y = df["amount"]
 model = sm.OLS(y, X, missing="drop").fit()
@@ -327,6 +383,9 @@ We conduct a t-test and a bivariate regression of the donation amount on treatme
 
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 treat_amount_gave = df.query("treatment == 1 and gave==1")["amount"]
 control_amount_gave = df.query("control == 1 and gave==1")["amount"]
 X = sm.add_constant(df.query("gave==1")["treatment"])
@@ -341,10 +400,12 @@ We then looked into the sample that made a donation and did the regression analy
 However, the coefficient does not allow a causal interpretation because adding conditions on treatment behavior (donating) introduces potential selection bias.
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
 
 fig, ax = plt.subplots()
 bars = ax.bar(
-    ["treat", "control"],
+    ["treatment", "control"],
     [treat_amount_gave.mean(), control_amount_gave.mean()],
     color=["skyblue", "orange"],
 )
@@ -380,6 +441,9 @@ Further suppose that the true distribution of respondents who do get a charitabl
 ### Law of Large Numbers
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 p_control = 0.018
 p_treat = 0.022
 n_sim = 10_000
@@ -409,6 +473,9 @@ This illustrates the Law of Large Numbers: as the number of simulations increase
 ### Central Limit Theorem
 
 ```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
 sample_sizes = [50, 200, 500, 1000]
 
 fig, axs = plt.subplots(2, 2, figsize=(12, 8))
