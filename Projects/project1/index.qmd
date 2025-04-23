@@ -387,7 +387,7 @@ model = sm.OLS(y, X, missing="drop").fit()
 print(model.summary())
 ```
 
-We conduct a t-test and a bivariate regression of the donation amount on treatment assignment. The results show that treatment group donors gave approximately $0.15 more on average than the control group, but the difference is small that the p-value wasn't statistically significant, meaning that the impact is limited. 
+I conduct a t-test and a bivariate regression of the donation amount on treatment assignment. The results show that treatment group donors gave approximately $0.15 more on average than the control group, but the difference is small that the p-value wasn't statistically significant, meaning that the impact is limited. 
 
 
 ```{python}
@@ -403,7 +403,7 @@ print(model.summary())
 
 ```
 
-We then looked into the sample that made a donation and did the regression analysis o donation amount on treatment assignment. The coefficient on treatment is −1.67 with a p-value of 0.561, indicating no statistically significant difference in donation amounts between the treatment and control groups, suggesting that the treatment group only, on average, gave slightly less than the control group.
+I then looked into the sample that made a donation and did the regression analysis o donation amount on treatment assignment. The coefficient on treatment is −1.67 with a p-value of 0.561, indicating no statistically significant difference in donation amounts between the treatment and control groups, suggesting that the treatment group only, on average, gave slightly less than the control group.
 
 However, the coefficient does not allow a causal interpretation because adding conditions on treatment behavior (donating) introduces potential selection bias.
 
