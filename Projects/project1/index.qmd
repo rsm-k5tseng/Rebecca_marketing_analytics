@@ -168,7 +168,7 @@ for v in test_variables:
         }
     )
 
-pd.set_option("display.float_format", "{:.2f}".format)
+pd.set_option("display.float_format", "{:.3f}".format)
 
 df_result = pd.DataFrame(results)
 df_result
@@ -264,10 +264,8 @@ X = sm.add_constant(df_clean["treatment"])
 y = df_clean["gave"]
 probit_model = sm.Probit(y, X).fit()
 
-print(probit_model.summary())
-
-mfx = probit_model.get_margeff()
-print(mfx.summary())
+ame = probit_model.get_margeff(at="overall").summary_frame()
+ame.round(3)
 ``` 
 
 The probit regression results also align with the t-test and regression results. It indicates that the treatment group has a statistically significant effect on the willingness of donating. The marginal effect of treatment is about 0.0043, meaning the treatment increases the probability of donation by approximately 0.43%.
@@ -376,34 +374,35 @@ print(
 )
 ```
 
-Linear Regression
+Regression
 ```{python}
 # | code-fold: true
 # | code-summary: "Code"
 
 X = sm.add_constant(df["treatment"])
 y = df["amount"]
-model = sm.OLS(y, X, missing="drop").fit()
-print(model.summary())
+model = smf.ols("amount ~ treatment", data=df).fit()
+coef_table = model.summary2().tables[1]
+print(coef_table)
 ```
 
 I conduct a t-test and a bivariate regression of the donation amount on treatment assignment. The results show that treatment group donors gave approximately $0.15 more on average than the control group, but the difference is small that the p-value wasn't statistically significant, meaning that the impact is limited. 
 
+I then looked into the sample that made a donation and did the regression analysis of donation amount on treatment assignment.
 
 ```{python}
 # | code-fold: true
 # | code-summary: "Code"
 
-treat_amount_gave = df.query("treatment == 1 and gave==1")["amount"]
-control_amount_gave = df.query("control == 1 and gave==1")["amount"]
-X = sm.add_constant(df.query("gave==1")["treatment"])
-y = df.query("gave==1")["amount"]
-model = sm.OLS(y, X, missing="drop").fit()
-print(model.summary())
+df_gave = df.query("gave==1")[["treatment", "amount"]]
+
+model = smf.ols("amount ~ treatment", data=df_gave).fit()
+coef_table = model.summary2().tables[1]
+print(coef_table)
 
 ```
 
-I then looked into the sample that made a donation and did the regression analysis o donation amount on treatment assignment. The coefficient on treatment is −1.67 with a p-value of 0.561, indicating no statistically significant difference in donation amounts between the treatment and control groups, suggesting that the treatment group only, on average, gave slightly less than the control group.
+ The coefficient on treatment is −1.67 with a p-value of 0.561, indicating no statistically significant difference in donation amounts between the treatment and control groups, suggesting that the treatment group only, on average, gave slightly less than the control group.
 
 However, the coefficient does not allow a causal interpretation because adding conditions on treatment behavior (donating) introduces potential selection bias.
 
@@ -414,7 +413,10 @@ However, the coefficient does not allow a causal interpretation because adding c
 fig, ax = plt.subplots()
 bars = ax.bar(
     ["treatment", "control"],
-    [treat_amount_gave.mean(), control_amount_gave.mean()],
+    [
+        df_gave.query("treatment==1")["amount"].mean(),
+        df_gave.query("treatment==0")["amount"].mean(),
+    ],
     color=["skyblue", "orange"],
 )
 
