@@ -7,5 +7,20 @@
   },
   "resume.qmd": {
     "resume.html": "fbd5f22f"
+  },
+  "hw1_questions.qmd": {
+    "hw1_questions.html": "7053543a"
+  },
+  "data/hw1_questions (1).qmd": {
+    "hw1_questions (1).html": "d4390f56"
+  },
+  "Projects.qmd": {
+    "Projects.html": "2897af8c"
+  },
+  "Projects/project1/index.qmd": {
+    "index.html": "5409c68e"
+  },
+  "Projects/project2/index.qmd": {
+    "index.html": "9cf3605d"
   }
 }

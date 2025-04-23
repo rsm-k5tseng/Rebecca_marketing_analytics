@@ -1,0 +1,441 @@
+---
+title: "A Replication of Karlan and List (2007)"
+author: "Kuan-Ling (Rebecca) Tseng"
+date: today
+callout-appearance: minimal # this hides the blue "i" icon on .callout-notes
+---
+
+
+## Introduction
+
+Dean Karlan at Yale and John List at the University of Chicago conducted a field experiment to test the effectiveness of different fundraising letters. They sent out 50,000 fundraising letters to potential donors, randomly assigning each letter to one of three treatments: a standard letter, a matching grant letter, or a challenge grant letter. They published the results of this experiment in the _American Economic Review_ in 2007. The article and supporting data are available from the [AEA website](https://www.aeaweb.org/articles?id=10.1257/aer.97.5.1774) and from Innovations for Poverty Action as part of [Harvard's Dataverse](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27853&version=4.2).
+
+In the experiment, the authors collaborated with a nonprofit organization and conducted a large-scale field experiment involving over 50,000 prior donors. Each donor was randomly assigned to receive one of several types of direct-mail fundraising letters.
+
+The control group received a standard letter with no match offer, while the treatment groups received a matching grant offer, where an anonymous donor pledged to match donations at a rate of 1:1, 2:1, or 3:1. Additionally, the letters varied in their presentation of the suggested donation amount and the total match cap ($25,000 / $50,000 / $100,000 / unstated).
+
+The researchers then tracked each recipient’s response—specifically:
+•	Whether they donated at all (gave)
+•	How much they donated (amount)
+
+This allowed the authors to examine whether matching grants increase donations, whether the size of the match ratio matters, and how the differences influence donor behavior.
+
+This project seeks to replicate their results.
+
+## Data
+
+### Description
+```{python}
+import pandas as pd
+
+df = pd.read_stata(
+    "/Users/rebeccatseng/Downloads/Rebecca_marketing_analytics/data/karlan_list_2007.dta",
+    iterator=False,
+)
+df.head()
+```
+
+```{python}
+df.describe()
+```
+_todo: Read the data into R/Python and describe the data_
+
+:::: {.callout-note collapse="true"}
+### Variable Definitions
+
+| Variable             | Description                                                         |
+|----------------------|---------------------------------------------------------------------|
+| `treatment`          | Treatment                                                           |
+| `control`            | Control                                                             |
+| `ratio`              | Match ratio                                                         |
+| `ratio2`             | 2:1 match ratio                                                     |
+| `ratio3`             | 3:1 match ratio                                                     |
+| `size`               | Match threshold                                                     |
+| `size25`             | \$25,000 match threshold                                            |
+| `size50`             | \$50,000 match threshold                                            |
+| `size100`            | \$100,000 match threshold                                           |
+| `sizeno`             | Unstated match threshold                                            |
+| `ask`                | Suggested donation amount                                           |
+| `askd1`              | Suggested donation was highest previous contribution                |
+| `askd2`              | Suggested donation was 1.25 x highest previous contribution         |
+| `askd3`              | Suggested donation was 1.50 x highest previous contribution         |
+| `ask1`               | Highest previous contribution (for suggestion)                      |
+| `ask2`               | 1.25 x highest previous contribution (for suggestion)               |
+| `ask3`               | 1.50 x highest previous contribution (for suggestion)               |
+| `amount`             | Dollars given                                                       |
+| `gave`               | Gave anything                                                       |
+| `amountchange`       | Change in amount given                                              |
+| `hpa`                | Highest previous contribution                                       |
+| `ltmedmra`           | Small prior donor: last gift was less than median \$35              |
+| `freq`               | Number of prior donations                                           |
+| `years`              | Number of years since initial donation                              |
+| `year5`              | At least 5 years since initial donation                             |
+| `mrm2`               | Number of months since last donation                                |
+| `dormant`            | Already donated in 2005                                             |
+| `female`             | Female                                                              |
+| `couple`             | Couple                                                              |
+| `state50one`         | State tag: 1 for one observation of each of 50 states; 0 otherwise  |
+| `nonlit`             | Nonlitigation                                                       |
+| `cases`              | Court cases from state in 2004-5 in which organization was involved |
+| `statecnt`           | Percent of sample from state                                        |
+| `stateresponse`      | Proportion of sample from the state who gave                        |
+| `stateresponset`     | Proportion of treated sample from the state who gave                |
+| `stateresponsec`     | Proportion of control sample from the state who gave                |
+| `stateresponsetminc` | stateresponset - stateresponsec                                     |
+| `perbush`            | State vote share for Bush                                           |
+| `close25`            | State vote share for Bush between 47.5% and 52.5%                   |
+| `red0`               | Red state                                                           |
+| `blue0`              | Blue state                                                          |
+| `redcty`             | Red county                                                          |
+| `bluecty`            | Blue county                                                         |
+| `pwhite`             | Proportion white within zip code                                    |
+| `pblack`             | Proportion black within zip code                                    |
+| `page18_39`          | Proportion age 18-39 within zip code                                |
+| `ave_hh_sz`          | Average household size within zip code                              |
+| `median_hhincome`    | Median household income within zip code                             |
+| `powner`             | Proportion house owner within zip code                              |
+| `psch_atlstba`       | Proportion who finished college within zip code                     |
+| `pop_propurban`      | Proportion of population urban within zip code                      |
+
+::::
+
+
+### Balance Test 
+
+As an ad hoc test of the randomization mechanism, I provide a series of tests that compare aspects of the treatment and control groups to assess whether they are statistically significantly different from one another.
+
+```{python}
+
+from sklearn import linear_model
+import numpy as np
+
+test_variables = ["hpa", "mrm2", "freq", "years", "year5", "dormant"]
+
+
+def compare_ttest_regress(variable):
+
+    subset = df[["treatment", variable]].dropna()
+    treat = subset[subset["treatment"] == 1][variable]
+    control = subset[subset["treatment"] == 0][variable]
+
+    # t-test
+    mean_diff = treat.mean() - control.mean()
+    var_treat = treat.var(ddof=1)
+    var_control = control.var(ddof=1)
+    se = np.sqrt(var_treat / len(treat) + var_control / len(control))
+    t_stat = mean_diff / se
+    ttest_result = round(t_stat, 2)
+
+    # regression
+    X = subset["treatment"].values.reshape(-1, 1)
+    y = subset[variable].values
+    reg = linear_model.LinearRegression()
+    reg.fit(X, y)
+    reg_result = round(reg.coef_[0] / se, 2)
+
+    return ttest_result, reg_result
+
+
+results = []
+for v in test_variables:
+    results.append(
+        {
+            "variable": v,
+            "t_test": compare_ttest_regress(v)[0],
+            "regress": compare_ttest_regress(v)[1],
+        }
+    )
+
+df_result = pd.DataFrame(results)
+df_result
+```
+
+
+## Experimental Results
+
+### Charitable Contribution Made
+
+First, I analyze whether matched donations lead to an increased response rate of making a donation. 
+
+```{python}
+import matplotlib.pyplot as plt
+
+
+df_treat = df.query("treatment==1")
+df_control = df.query("control==1")
+treat_prop = df_treat["gave"].value_counts(normalize=True)
+control_prop = df_control["gave"].value_counts(normalize=True)
+
+fig, ax = plt.subplots()
+bars = ax.bar(
+    ["treat", "control"],
+    [treat_prop[1] * 100, control_prop[1] * 100],
+    color=["skyblue", "orange"],
+)
+
+for bar in bars:
+    height = bar.get_height()
+    ax.annotate(
+        f"{height:.1f}%",
+        xy=(bar.get_x() + bar.get_width() / 2, height),
+        xytext=(0, 2),
+        textcoords="offset points",
+        ha="center",
+        va="bottom",
+    )
+
+
+```
+
+```{python}
+treat = df[df["treatment"] == 1]["gave"]
+control = df[df["treatment"] == 0]["gave"]
+# t-test
+mean_diff = treat.mean() - control.mean()
+var_treat = treat.var(ddof=1)
+var_control = control.var(ddof=1)
+se = np.sqrt(var_treat / len(treat) + var_control / len(control))
+t_stat = mean_diff / se
+ttest_result = round(t_stat, 2)
+ttest_result
+```
+
+Since the t-test result is so large, we can conclude that the treatment group is significantly more willing to donate than the control group.
+
+```{python}
+# regression
+X = df["treatment"].values.reshape(-1, 1)
+y = df["gave"].values
+reg = linear_model.LinearRegression()
+reg.fit(X, y)
+reg_result = round(reg.coef_[0] / se, 2)
+reg_result
+```
+
+According to the linear regression model, the coefficient is so big that we can conclude that the treatment group is more likely to donate than the control group.
+
+
+```{python}
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+
+df_clean = df[["gave", "treatment"]].dropna()
+
+X = sm.add_constant(df_clean["treatment"])
+y = df_clean["gave"]
+probit_model = sm.Probit(y, X).fit()
+
+print(probit_model.summary())
+
+mfx = probit_model.get_margeff()
+print(mfx.summary())
+```
+
+Based on the probit regression result, people in the treatment group are significantly more inclined to donate money.
+
+### Differences between Match Rates
+
+Next, I assess the effectiveness of different sizes of matched donations on the response rate.
+
+```{python}
+from scipy import stats
+
+ratio1 = df.query("ratio==1")["gave"]
+ratio2 = df.query("ratio2==1")["gave"]
+ratio3 = df.query("ratio3==1")["gave"]
+
+
+# t-test
+def t_test(df1, df2):
+    mean_diff = df1.mean() - df2.mean()
+    var1 = df1.var(ddof=1)
+    var2 = df2.var(ddof=1)
+    se = np.sqrt(var1 / len(df1) + var2 / len(df2))
+    t_stat = mean_diff / se
+    ttest_result = round(t_stat, 2)
+    degree_of_freedom = (var1 / len(df1) + var1 / len(df2)) ** 2 / (
+        ((var1 / len(df1)) ** 2) / (len(df1) - 1)
+        + ((var1 / len(df2)) ** 2) / (len(df2) - 1)
+    )
+
+    p_value = stats.t.sf(np.abs(t_stat), degree_of_freedom) * 2
+
+    return ttest_result, round(p_value, 2)
+
+
+print(
+    f"1:1 vs 2:1: t-test {t_test(ratio2, ratio1)[0]}, p-value {t_test(ratio2, ratio1)[1]}"
+)
+print(
+    f"2:1 vs 3:1: t-test {t_test(ratio3, ratio2)[0]}, p-value {t_test(ratio3, ratio2)[1]}"
+)
+print(
+    f"1:1 vs 3:1: t-test {t_test(ratio3, ratio1)[0]}, p-value {t_test(ratio3, ratio1)[1]}"
+)
+```
+
+The results show that there are no significant difference between match ratios, 1:1 vs 2:1, 2:1 vs 3:1, or 1:1 vs 3:1.
+
+```{python}
+X = df[["ratio2", "ratio3"]]
+X = sm.add_constant(X)
+y = df["gave"]
+
+model = sm.OLS(y, X).fit()
+print(model.summary())
+```
+
+
+```{python}
+ratio1_mean = df.query("(ratio2 == 0) & (ratio3 == 0)")["gave"].mean()
+ratio2_mean = df.query("ratio2==1")["gave"].mean()
+ratio3_mean = df.query("ratio3==1")["gave"].mean()
+
+diff11_21 = ratio2_mean - ratio1_mean
+diff21_31 = ratio3_mean - ratio2_mean
+
+print(f"2:1 - 1:1 = {diff11_21:.4f}")
+print(f"3:1 - 2:1 = {diff21_31:.4f}")
+```
+
+When calculating the response rate directly from the data, the difference between the 2:1 and 1:1 match ratios is about 0.36, while the difference between 3:1 and 2:1 is only 0.01. These results are consistent with the coefficients from the OLS regression, where ratio2 and ratio3 have coefficients of 0.0036 and 0.0037 respectively.
+
+In conclusion, increasing the match ratio from 1:1 to 2:1 appears to have a small positive effect on donation likelihood, but increasing the match ratio further to 3:1 shows no additional gain. 
+
+### Size of Charitable Contribution
+
+In this subsection, I analyze the effect of the size of matched donation on the size of the charitable contribution.
+
+T-test
+```{python}
+treat_amount = df.query("treatment == 1")["amount"]
+control_amount = df.query("control == 1")["amount"]
+print(
+    f"t_stats: {t_test(treat_amount, control_amount)[0]:.2f}, p-value: {t_test(treat_amount, control_amount)[1]:.2f}"
+)
+```
+
+Linear Regression
+```{python}
+X = sm.add_constant(df["treatment"])
+y = df["amount"]
+model = sm.OLS(y, X, missing="drop").fit()
+print(model.summary())
+```
+
+We conduct a t-test and a bivariate regression of the donation amount on treatment assignment. The results show that treatment group donors gave approximately $0.15 more on average than the control group, but the difference is small that the p-value wasn't statistically significant, meaning that the impact is limited. 
+
+
+```{python}
+treat_amount_gave = df.query("treatment == 1 and gave==1")["amount"]
+control_amount_gave = df.query("control == 1 and gave==1")["amount"]
+X = sm.add_constant(df.query("gave==1")["treatment"])
+y = df.query("gave==1")["amount"]
+model = sm.OLS(y, X, missing="drop").fit()
+print(model.summary())
+
+```
+
+We then looked into the sample that made a donation and did the regression analysis o donation amount on treatment assignment. The coefficient on treatment is −1.67 with a p-value of 0.561, indicating no statistically significant difference in donation amounts between the treatment and control groups, suggesting that the treatment group only, on average, gave slightly less than the control group.
+
+However, the coefficient does not allow a causal interpretation because adding conditions on treatment behavior (donating) introduces potential selection bias.
+
+```{python}
+
+fig, ax = plt.subplots()
+bars = ax.bar(
+    ["treat", "control"],
+    [treat_amount_gave.mean(), control_amount_gave.mean()],
+    color=["skyblue", "orange"],
+)
+
+for bar in bars:
+    height = bar.get_height()
+    ax.annotate(
+        f"${height:.2f}",
+        xy=(bar.get_x() + bar.get_width() / 2, height),
+        xytext=(0, 2),
+        textcoords="offset points",
+        ha="center",
+        va="bottom",
+    )
+
+ax.set_ylabel("Average Donation Amount ($)")
+ax.set_title("Average Donation Amount")
+
+plt.show()
+```
+
+The bar chart compares the average donation amounts between treatment and control groups, conditional on having donated. The control group gave slightly more on average ($45.54) than the treatment group ($43.87).
+
+
+## Simulation Experiment
+
+As a reminder of how the t-statistic "works," in this section I use simulation to demonstrate the Law of Large Numbers and the Central Limit Theorem.
+
+Suppose the true distribution of respondents who do not get a charitable donation match is Bernoulli with probability p=0.018 that a donation is made. 
+
+Further suppose that the true distribution of respondents who do get a charitable donation match of any size  is Bernoulli with probability p=0.022 that a donation is made.
+
+### Law of Large Numbers
+
+```{python}
+p_control = 0.018
+p_treat = 0.022
+n_sim = 10_000
+
+np.random.seed(100)
+control_draw = np.random.binomial(1, p_control, n_sim)
+treat_draw = np.random.binomial(1, p_treat, n_sim)
+
+diff = treat_draw - control_draw
+cumulative_avg = np.cumsum(diff) / np.arange(1, n_sim + 1)
+
+plt.figure(figsize=(10, 5))
+plt.plot(cumulative_avg, label="Cumulative Avg of Difference: Treatment - Control")
+plt.axhline(p_treat - p_control, color="red", linestyle="--", label="True Mean Diff")
+plt.title("Simulation of Cumulative Average Difference")
+plt.xlabel("Number of Simulations")
+plt.ylabel("Cumulative Average")
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+The figure shows the cumulative average difference between treatment and control groups from a simulation. The average converges toward the true difference (0.004) as the number of simulations gets larger.
+
+This illustrates the Law of Large Numbers: as the number of simulations increases, the observed mean gets closer to the expected (true) mean.
+
+### Central Limit Theorem
+
+```{python}
+sample_sizes = [50, 200, 500, 1000]
+
+fig, axs = plt.subplots(2, 2, figsize=(12, 8))
+axs = axs.flatten()
+
+for i, n in enumerate(sample_sizes):
+    diffs = []
+    np.random.seed(100)
+    for _ in range(n_sim):
+        c = np.random.binomial(1, p_control, n).mean()
+        t = np.random.binomial(1, p_treat, n).mean()
+        diffs.append(t - c)
+
+    axs[i].hist(diffs, bins=30, color="lightblue", edgecolor="black")
+    axs[i].axvline(0, color="red", linestyle="--", label="Zero Line")
+    axs[i].axvline(np.mean(diffs), color="green", linestyle="-", label="Mean Diff")
+    axs[i].set_title(f"Sample size = {n}")
+    axs[i].set_xlabel("Treatment - Control Mean Diff")
+    axs[i].set_ylabel("Frequency")
+    axs[i].legend()
+
+plt.suptitle("Central Limit Theorem: Distribution of Mean Differences")
+plt.tight_layout()
+plt.show()
+```
+
+As the sample size gets larger (50, 200, 500, 1,000), the distribution of average differences will be narrower, more symmetric, and closer to normal distribution.
+
+For small samples (e.g., n = 50), the distribution is noisy and is closer to 0. As n becomes larger (e.g., n = 1,000), the distribution converges to normal and centers around the true effect (0.04).
+
