@@ -277,6 +277,7 @@ The z-score is 3.104 with a p-value of 0.002, providing strong evidence that the
 ### Differences between Match Rates
 
 Next, I assess the effectiveness of different sizes of matched donations on the response rate.
+There are three matched donation ratios: 1-1, 2-1, 3-1
 
 ```{python}
 # | code-fold: true
@@ -297,10 +298,11 @@ def t_test(df1, df2):
     se = np.sqrt(var1 / len(df1) + var2 / len(df2))
     t_stat = mean_diff / se
     ttest_result = round(t_stat, 2)
-    degree_of_freedom = (var1 / len(df1) + var1 / len(df2)) ** 2 / (
-        ((var1 / len(df1)) ** 2) / (len(df1) - 1)
-        + ((var1 / len(df2)) ** 2) / (len(df2) - 1)
-    )
+    numerator = (var1 / len(df1) + var2 / len(df2)) ** 2
+    denominator = ((var1 / len(df1)) ** 2) / (len(df1) - 1) + (
+        (var2 / len(df2)) ** 2
+    ) / (len(df2) - 1)
+    degree_of_freedom = numerator / denominator
 
     p_value = stats.t.sf(np.abs(t_stat), degree_of_freedom) * 2
 
@@ -318,37 +320,43 @@ print(
 )
 ```
 
-The results show that there are no significant difference between match ratios, 1:1 vs 2:1, 2:1 vs 3:1, or 1:1 vs 3:1.
+The two-sample t-tests comparing match ratios (1:1 vs 2:1, 2:1 vs 3:1, and 1:1 vs 3:1) yield no statistically significant differences, with p-values all above 0.05. This suggests that, based on pairwise comparisons, larger match ratios do not significantly increase the likelihood of donation.
 
 ```{python}
 # | code-fold: true
 # | code-summary: "Code"
+import statsmodels.formula.api as smf
 
 X = df[["ratio2", "ratio3"]]
 X = sm.add_constant(X)
 y = df["gave"]
-
-model = sm.OLS(y, X).fit()
-print(model.summary())
+pd.set_option("display.float_format", "{:.3f}".format)
+model = smf.ols("gave~ratio2+ratio3-1", data=df).fit()
+model.summary2().tables[1].round(3)
 ```
 
+The OLS regression results show that both the 2:1 and 3:1 match conditions have statistically significant positive coefficients (0.023), indicating that individuals in these groups are more likely to donate compared to the 1:1 baseline. However, since the coefficients for 2:1 and 3:1 are nearly identical, this suggests that raising the match ratio from 2:1 to 3:1 does not lead to any additional gain.
+
+T-tests compare two groups directly and are more conservative when sample sizes differ, whereas the regression model uses all data and estimates relative effects simultaneously, leading to greater statistical power. Importantly, both methods agree on the core insight: offering a match increases donations, but increasing the size of the match (beyond 1:1) does not matter.
+
+I further looked into the mean probabilities of making donations among ratio 1:1, 2:1, and 3:1.
 
 ```{python}
 # | code-fold: true
 # | code-summary: "Code"
 
-ratio1_mean = df.query("(ratio2 == 0) & (ratio3 == 0)")["gave"].mean()
+ratio1_mean = df.query("ratio==1")["gave"].mean()
 ratio2_mean = df.query("ratio2==1")["gave"].mean()
 ratio3_mean = df.query("ratio3==1")["gave"].mean()
 
 diff11_21 = ratio2_mean - ratio1_mean
 diff21_31 = ratio3_mean - ratio2_mean
 
-print(f"2:1 - 1:1 = {diff11_21:.4f}")
-print(f"3:1 - 2:1 = {diff21_31:.4f}")
+print(f"Difference in mean between 2:1 and 1:1 = {diff11_21:.4f}")
+print(f"Difference in mean between 3:1 and 2:1 = {diff21_31:.4f}")
 ```
 
-When calculating the response rate directly from the data, the difference between the 2:1 and 1:1 match ratios is about 0.36, while the difference between 3:1 and 2:1 is only 0.01. These results are consistent with the coefficients from the OLS regression, where ratio2 and ratio3 have coefficients of 0.0036 and 0.0037 respectively.
+When calculating the response rate directly from the data, the difference between the 2:1 and 1:1 match ratios is about 0.19%, while the difference between 3:1 and 2:1 is only 0.01%. These results are consistent with the coefficients from the OLS regression, where ratio2 and ratio3 have coefficients of 0.0036 and 0.0037 respectively.
 
 In conclusion, increasing the match ratio from 1:1 to 2:1 appears to have a small positive effect on donation likelihood, but increasing the match ratio further to 3:1 shows no additional gain. 
 
