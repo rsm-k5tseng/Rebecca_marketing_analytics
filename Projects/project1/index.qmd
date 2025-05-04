@@ -35,7 +35,7 @@ The dataset contains 51 columns, with 50,083 rows (mails sent). There are 33,396
 import pandas as pd
 
 df = pd.read_stata(
-    "/Users/rebeccatseng/Downloads/Rebecca_marketing_analytics/data/karlan_list_2007.dta",
+    "../../data/karlan_list_2007.dta",
     iterator=False,
 )
 print(f"Rows: {df.shape[0]:,}, Columns: {df.shape[1]:,}")

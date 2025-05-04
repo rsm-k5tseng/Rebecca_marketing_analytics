@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Kuan-Ling (Rebecca) Tseng">
-<meta name="dcterms.date" content="2025-04-23">
+<meta name="dcterms.date" content="2025-05-02">
 
 <title>A Replication of Karlan and List (2007) – Rebecca’s Website</title>
 <style>
@@ -197,7 +197,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">April 23, 2025</p>
+      <p class="date">May 2, 2025</p>
     </div>
   </div>
   
@@ -227,13 +227,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="description" class="level3">
 <h3 class="anchored" data-anchor-id="description">Description</h3>
 <p>The dataset contains 51 columns, with 50,083 rows (mails sent). There are 33,396 mails sent to the treatment group, while 16,687 mails sent to the control group. As for the match ratio, 11,133 mails got 1:1, 11,134 mails got 2:1, and 11,129 mails got 3:1.</p>
-<div id="d32a9f40" class="cell" data-execution_count="1">
+<div id="1ef1a0a3" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_stata(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"/Users/rebeccatseng/Downloads/Rebecca_marketing_analytics/data/karlan_list_2007.dta"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"../../data/karlan_list_2007.dta"</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    iterator<span class="op">=</span><span class="va">False</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Rows: </span><span class="sc">{</span>df<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">:,}</span><span class="ss">, Columns: </span><span class="sc">{</span>df<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">:,}</span><span class="ss">"</span>)</span>
@@ -248,7 +248,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 Treatment group: 33,396, Contol group: 16,687
 Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="90">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
 
@@ -293,16 +293,16 @@ Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>0.000</td>
-<td>1.000</td>
-<td>0.446</td>
-<td>0.528</td>
-<td>0.318</td>
-<td>2.100</td>
-<td>28517.000</td>
-<td>0.500</td>
-<td>0.325</td>
-<td>1.000</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.446493</td>
+<td>0.527769</td>
+<td>0.317591</td>
+<td>2.10</td>
+<td>28517.0</td>
+<td>0.499807</td>
+<td>0.324528</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
@@ -317,8 +317,8 @@ Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>1.000</td>
-<td>0.000</td>
+<td>1.0</td>
+<td>0.0</td>
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
@@ -341,16 +341,16 @@ Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 <td>1</td>
 <td>0</td>
 <td>...</td>
-<td>0.000</td>
-<td>1.000</td>
-<td>0.936</td>
-<td>0.012</td>
-<td>0.276</td>
-<td>2.480</td>
-<td>51175.000</td>
-<td>0.722</td>
-<td>0.193</td>
-<td>1.000</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.935706</td>
+<td>0.011948</td>
+<td>0.276128</td>
+<td>2.48</td>
+<td>51175.0</td>
+<td>0.721941</td>
+<td>0.192668</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
@@ -365,16 +365,16 @@ Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 <td>0</td>
 <td>1</td>
 <td>...</td>
-<td>1.000</td>
-<td>0.000</td>
-<td>0.888</td>
-<td>0.011</td>
-<td>0.279</td>
-<td>2.650</td>
-<td>79269.000</td>
-<td>0.920</td>
-<td>0.412</td>
-<td>1.000</td>
+<td>1.0</td>
+<td>0.0</td>
+<td>0.888331</td>
+<td>0.010760</td>
+<td>0.279412</td>
+<td>2.65</td>
+<td>79269.0</td>
+<td>0.920431</td>
+<td>0.412142</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
@@ -389,16 +389,16 @@ Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>0.000</td>
-<td>1.000</td>
-<td>0.759</td>
-<td>0.127</td>
-<td>0.442</td>
-<td>1.850</td>
-<td>40908.000</td>
-<td>0.416</td>
-<td>0.440</td>
-<td>1.000</td>
+<td>0.0</td>
+<td>1.0</td>
+<td>0.759014</td>
+<td>0.127421</td>
+<td>0.442389</td>
+<td>1.85</td>
+<td>40908.0</td>
+<td>0.416072</td>
+<td>0.439965</td>
+<td>1.0</td>
 </tr>
 </tbody>
 </table>
@@ -407,12 +407,12 @@ Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 </div>
 </div>
 </div>
-<div id="9d1f5c18" class="cell" data-execution_count="2">
+<div id="2dd610c7" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="91">
+<div class="cell-output cell-output-display" data-execution_count="3">
 <div>
 
 
@@ -446,195 +446,195 @@ Ratio 1:1: 11,133, Ratio 2:1: 11,134, Ratio 3:1: 11,129</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">count</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
-<td>50083.000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
+<td>50083.000000</td>
 <td>...</td>
-<td>49978.000</td>
-<td>49978.000</td>
-<td>48217.000</td>
-<td>48047.000</td>
-<td>48217.000</td>
-<td>48221.000</td>
-<td>48209.000</td>
-<td>48214.000</td>
-<td>48215.000</td>
-<td>48217.000</td>
+<td>49978.000000</td>
+<td>49978.000000</td>
+<td>48217.000000</td>
+<td>48047.000000</td>
+<td>48217.000000</td>
+<td>48221.000000</td>
+<td>48209.000000</td>
+<td>48214.000000</td>
+<td>48215.000000</td>
+<td>48217.000000</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">mean</td>
-<td>0.667</td>
-<td>0.333</td>
-<td>0.222</td>
-<td>0.222</td>
-<td>0.167</td>
-<td>0.167</td>
-<td>0.167</td>
-<td>0.167</td>
-<td>0.222</td>
-<td>0.222</td>
+<td>0.666813</td>
+<td>0.333187</td>
+<td>0.222311</td>
+<td>0.222211</td>
+<td>0.166723</td>
+<td>0.166623</td>
+<td>0.166723</td>
+<td>0.166743</td>
+<td>0.222311</td>
+<td>0.222291</td>
 <td>...</td>
-<td>0.510</td>
-<td>0.489</td>
-<td>0.820</td>
-<td>0.087</td>
-<td>0.322</td>
-<td>2.429</td>
-<td>54815.701</td>
-<td>0.669</td>
-<td>0.392</td>
-<td>0.872</td>
+<td>0.510245</td>
+<td>0.488715</td>
+<td>0.819599</td>
+<td>0.086710</td>
+<td>0.321694</td>
+<td>2.429012</td>
+<td>54815.700533</td>
+<td>0.669418</td>
+<td>0.391661</td>
+<td>0.871968</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">std</td>
-<td>0.471</td>
-<td>0.471</td>
-<td>0.416</td>
-<td>0.416</td>
-<td>0.373</td>
-<td>0.373</td>
-<td>0.373</td>
-<td>0.373</td>
-<td>0.416</td>
-<td>0.416</td>
+<td>0.471357</td>
+<td>0.471357</td>
+<td>0.415803</td>
+<td>0.415736</td>
+<td>0.372732</td>
+<td>0.372643</td>
+<td>0.372732</td>
+<td>0.372750</td>
+<td>0.415803</td>
+<td>0.415790</td>
 <td>...</td>
-<td>0.500</td>
-<td>0.500</td>
-<td>0.169</td>
-<td>0.136</td>
-<td>0.103</td>
-<td>0.378</td>
-<td>22027.317</td>
-<td>0.193</td>
-<td>0.187</td>
-<td>0.259</td>
+<td>0.499900</td>
+<td>0.499878</td>
+<td>0.168561</td>
+<td>0.135868</td>
+<td>0.103039</td>
+<td>0.378115</td>
+<td>22027.316665</td>
+<td>0.193405</td>
+<td>0.186599</td>
+<td>0.258654</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">min</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
 <td>...</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.009</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>5000.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.009418</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>5000.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">25%</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
 <td>...</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.756</td>
-<td>0.015</td>
-<td>0.258</td>
-<td>2.210</td>
-<td>39181.000</td>
-<td>0.560</td>
-<td>0.236</td>
-<td>0.885</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.755845</td>
+<td>0.014729</td>
+<td>0.258311</td>
+<td>2.210000</td>
+<td>39181.000000</td>
+<td>0.560222</td>
+<td>0.235647</td>
+<td>0.884929</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">50%</td>
-<td>1.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
 <td>...</td>
-<td>1.000</td>
-<td>0.000</td>
-<td>0.873</td>
-<td>0.037</td>
-<td>0.306</td>
-<td>2.440</td>
-<td>50673.000</td>
-<td>0.712</td>
-<td>0.374</td>
-<td>1.000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.872797</td>
+<td>0.036554</td>
+<td>0.305534</td>
+<td>2.440000</td>
+<td>50673.000000</td>
+<td>0.712296</td>
+<td>0.373744</td>
+<td>1.000000</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">75%</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
-<td>0.000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
 <td>...</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>0.939</td>
-<td>0.091</td>
-<td>0.369</td>
-<td>2.660</td>
-<td>66005.000</td>
-<td>0.817</td>
-<td>0.530</td>
-<td>1.000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>0.938827</td>
+<td>0.090882</td>
+<td>0.369132</td>
+<td>2.660000</td>
+<td>66005.000000</td>
+<td>0.816798</td>
+<td>0.530036</td>
+<td>1.000000</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">max</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
 <td>...</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>0.990</td>
-<td>0.998</td>
-<td>5.270</td>
-<td>200001.000</td>
-<td>1.000</td>
-<td>1.000</td>
-<td>1.000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>0.989622</td>
+<td>0.997544</td>
+<td>5.270000</td>
+<td>200001.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
 </tr>
 </tbody>
 </table>
@@ -882,7 +882,7 @@ Variable Definitions
 <p>As an ad hoc test of the randomization mechanism, I provide a series of tests that compare aspects of the treatment and control groups to assess whether they are statistically significantly different from one another.</p>
 <p>Selected Variables:<code>hpa</code>, <code>mrm2</code>, <code>freq</code>, <code>years</code>, <code>year5</code>, <code>dormant</code></p>
 <p>For the selected variables, I did <strong>T-test</strong> and <strong>regression</strong> to examine the difference between two groups - control group and treatment group.</p>
-<div id="e1c0e47b" class="cell" data-execution_count="3">
+<div id="4c5a84e8" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn <span class="im">import</span> linear_model</span>
@@ -933,7 +933,7 @@ Variable Definitions
 <span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>df_result <span class="op">=</span> pd.DataFrame(results)</span>
 <span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>df_result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="92">
+<div class="cell-output cell-output-display" data-execution_count="4">
 <div>
 
 
@@ -1019,7 +1019,7 @@ Variable Definitions
 <section id="charitable-contribution-made" class="level3">
 <h3 class="anchored" data-anchor-id="charitable-contribution-made">Charitable Contribution Made</h3>
 <p>First, I analyze whether matched donations lead to an increased response rate of making a donation.</p>
-<div id="394b4c7f" class="cell" data-execution_count="4">
+<div id="014e755b" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -1056,7 +1056,7 @@ Variable Definitions
 </div>
 </div>
 </div>
-<div id="fb6f8626" class="cell" data-execution_count="5">
+<div id="e74fb031" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>treat <span class="op">=</span> df[df[<span class="st">"treatment"</span>] <span class="op">==</span> <span class="dv">1</span>][<span class="st">"gave"</span>]</span>
@@ -1075,7 +1075,7 @@ Variable Definitions
 </div>
 </div>
 <p>Since the t-test result is so large, we can conclude that the treatment group is significantly more willing to donate than the control group.</p>
-<div id="e97292e3" class="cell" data-execution_count="6">
+<div id="61f706c3" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># regression</span></span>
@@ -1091,7 +1091,7 @@ Variable Definitions
 </div>
 </div>
 <p>According to the linear regression model, the coefficient is so big that we can conclude that the treatment group is more likely to donate than the control group.</p>
-<div id="df1f7b37" class="cell" data-execution_count="7">
+<div id="4319d9c7" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.api <span class="im">as</span> sm</span>
@@ -1111,7 +1111,7 @@ Variable Definitions
          Current function value: 0.100443
          Iterations 7</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="96">
+<div class="cell-output cell-output-display" data-execution_count="8">
 <div>
 
 
@@ -1149,7 +1149,7 @@ Variable Definitions
 <section id="differences-between-match-rates" class="level3">
 <h3 class="anchored" data-anchor-id="differences-between-match-rates">Differences between Match Rates</h3>
 <p>Next, I assess the effectiveness of different sizes of matched donations on the response rate. There are three matched donation ratios: 1-1, 2-1, 3-1</p>
-<div id="ad6d2b49" class="cell" data-execution_count="8">
+<div id="66710ad4" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
@@ -1195,7 +1195,7 @@ Variable Definitions
 </div>
 </div>
 <p>The two-sample t-tests comparing match ratios (1:1 vs 2:1, 2:1 vs 3:1, and 1:1 vs 3:1) yield no statistically significant differences, with p-values all above 0.05. This suggests that, based on pairwise comparisons, larger match ratios do not significantly increase the likelihood of donation.</p>
-<div id="e3bfe1b4" class="cell" data-execution_count="9">
+<div id="1620e5f3" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
@@ -1207,7 +1207,7 @@ Variable Definitions
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> smf.ols(<span class="st">"gave~ratio2+ratio3-1"</span>, data<span class="op">=</span>df).fit()</span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>model.summary2().tables[<span class="dv">1</span>].<span class="bu">round</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="98">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <div>
 
 
@@ -1251,7 +1251,7 @@ Variable Definitions
 <p>The OLS regression results show that both the 2:1 and 3:1 match conditions have statistically significant positive coefficients (0.023), indicating that individuals in these groups are more likely to donate compared to the 1:1 baseline. However, since the coefficients for 2:1 and 3:1 are nearly identical, this suggests that raising the match ratio from 2:1 to 3:1 does not lead to any additional gain.</p>
 <p>T-tests compare two groups directly and are more conservative when sample sizes differ, whereas the regression model uses all data and estimates relative effects simultaneously, leading to greater statistical power. Importantly, both methods agree on the core insight: offering a match increases donations, but increasing the size of the match (beyond 1:1) does not matter.</p>
 <p>I further looked into the mean probabilities of making donations among ratio 1:1, 2:1, and 3:1.</p>
-<div id="96f3c989" class="cell" data-execution_count="10">
+<div id="84701bbc" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ratio1_mean <span class="op">=</span> df.query(<span class="st">"ratio==1"</span>)[<span class="st">"gave"</span>].mean()</span>
@@ -1276,7 +1276,7 @@ Difference in mean between 3:1 and 2:1 = 0.0001</code></pre>
 <h3 class="anchored" data-anchor-id="size-of-charitable-contribution">Size of Charitable Contribution</h3>
 <p>In this subsection, I analyze the effect of the size of matched donation on the size of the charitable contribution.</p>
 <p>T-test</p>
-<div id="89d5f858" class="cell" data-execution_count="11">
+<div id="ef203a2b" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>treat_amount <span class="op">=</span> df.query(<span class="st">"treatment == 1"</span>)[<span class="st">"amount"</span>]</span>
@@ -1290,7 +1290,7 @@ Difference in mean between 3:1 and 2:1 = 0.0001</code></pre>
 </div>
 </div>
 <p>Regression</p>
-<div id="d3a6906b" class="cell" data-execution_count="12">
+<div id="3e0ca600" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(df[<span class="st">"treatment"</span>])</span>
@@ -1307,7 +1307,7 @@ treatment  0.154     0.083  1.861  0.063  -0.008   0.315</code></pre>
 </div>
 <p>I conduct a t-test and a bivariate regression of the donation amount on treatment assignment. The results show that treatment group donors gave approximately $0.15 more on average than the control group, but the difference is small that the p-value wasn’t statistically significant, meaning that the impact is limited.</p>
 <p>I then looked into the sample that made a donation and did the regression analysis of donation amount on treatment assignment.</p>
-<div id="67f00838" class="cell" data-execution_count="13">
+<div id="fe24d220" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>df_gave <span class="op">=</span> df.query(<span class="st">"gave==1"</span>)[[<span class="st">"treatment"</span>, <span class="st">"amount"</span>]]</span>
@@ -1324,7 +1324,7 @@ treatment -1.668     2.872 -0.581  0.561  -7.305   3.968</code></pre>
 </div>
 <p>The coefficient on treatment is −1.67 with a p-value of 0.561, indicating no statistically significant difference in donation amounts between the treatment and control groups, suggesting that the treatment group only, on average, gave slightly less than the control group.</p>
 <p>However, the coefficient does not allow a causal interpretation because adding conditions on treatment behavior (donating) introduces potential selection bias.</p>
-<div id="23865480" class="cell" data-execution_count="14">
+<div id="6c25ce3d" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
@@ -1371,7 +1371,7 @@ treatment -1.668     2.872 -0.581  0.561  -7.305   3.968</code></pre>
 <p>Further suppose that the true distribution of respondents who do get a charitable donation match of any size is Bernoulli with probability p=0.022 that a donation is made.</p>
 <section id="law-of-large-numbers" class="level3">
 <h3 class="anchored" data-anchor-id="law-of-large-numbers">Law of Large Numbers</h3>
-<div id="410d2bb2" class="cell" data-execution_count="15">
+<div id="bb8a28b9" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>p_control <span class="op">=</span> <span class="fl">0.018</span></span>
@@ -1408,7 +1408,7 @@ treatment -1.668     2.872 -0.581  0.561  -7.305   3.968</code></pre>
 </section>
 <section id="central-limit-theorem" class="level3">
 <h3 class="anchored" data-anchor-id="central-limit-theorem">Central Limit Theorem</h3>
-<div id="cc9a8dd5" class="cell" data-execution_count="16">
+<div id="5b7bda78" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sample_sizes <span class="op">=</span> [<span class="dv">50</span>, <span class="dv">200</span>, <span class="dv">500</span>, <span class="dv">1000</span>]</span>
