@@ -590,8 +590,8 @@ summary_table.round(3)
 
 In conclusion, all features included in the Poisson regression model exhibit statistically significant effects on the number of reviews, which we use as a proxy for customer engagement. While most variables, such as price, number of bedrooms, cleanliness score, and instant bookability, show positive associations with review counts, a few results stand out as counterintuitive:
 
-- Number of bathrooms,
-- Review score for location, and
+- Number of bathrooms
+- Review score for location
 - Review score for value
 
 These variables are all negatively associated with the number of reviews.
