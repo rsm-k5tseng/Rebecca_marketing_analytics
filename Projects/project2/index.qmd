@@ -593,7 +593,7 @@ In conclusion, all features included in the Poisson regression model exhibit sta
 - Number of bathrooms
 - Review score for location
 - Review score for value
-
+ 
 These variables are all negatively associated with the number of reviews.
 
 One possible explanation is that higher-end listings, which tend to have more bathrooms and receive higher quality scores, may also experience lower guest turnover, therefore, generate fewer reviews. This assumption requires further investigation into whether these listings differ systematically in actual booking frequency or in the sentiment of their reviews.
