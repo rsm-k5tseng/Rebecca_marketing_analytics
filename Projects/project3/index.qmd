@@ -163,7 +163,7 @@ conjoint_data.head()
 Code for log-likelihood function:
 First, I built a log-likelihood function to evaluate the fit of the Maximum Likelihood model, with four inputs, beta, X, y, and the unique respondent and task combination.
 
-- beta: model coefficient
+- β: model coefficient
 - X: feature matrix
 - y: binary outcome of chosen or not
 - resp_task: an array that identifies the respondent and task combination for each row
@@ -292,8 +292,8 @@ The method proceeds as follows:
      $$
 
    - Accept the new proposal with probability $\alpha$. In log terms, accept if:
-   (1) \beta^{\text{new}} > \beta^{\text{current}}
-   (2) \beta^{\text{new}} < \beta^{\text{current}} and \beta^{\text{new}} / \beta^{\text{current}} > random number
+   (1) β new > β current
+   (2) β new < β current and β new / β current > random number
 4. **Iteration**: Repeat for 11,000 iterations, discarding the first 1,000 results to ensure convergence.
 
 ```{python}
@@ -349,10 +349,10 @@ posterior_samples = metropolis_hastings(posterior, X, y, id_task_pairs)
 
 The result of the sampled values confirms the Markov chain's convergence, demonstrating its successful exploration of the posterior distribution's most probable areas. The resulting estimates are consistent with the true coefficients used in the prior process.
 
-- \beta_{\text{Netflix}} = 1.0
-- \beta_{\text{Prime}} = 0.5
-- \beta_{\text{Ads}} = -0.8
-- \beta_{\text{Price}} = -0.1
+- β Netflix = 1.0
+- β Prime = 0.5
+- β Ads = -0.8
+- β Price = -0.1
 
 This suggests the MCMC implementation is working correctly and effectively approximates the posterior distribution.
 
