@@ -1,5 +1,5 @@
 ---
 title: "Resume"
 ---
-{{< pdf ./pdf/Kuan_Ling_Tseng_Resume.pdf width=100% height=800 >}}
+{{< pdf ./pdf/Kuan_Ling_Tseng_Resume.pdf?updated=true width=100% height=800 >}}
 
