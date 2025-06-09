@@ -1,0 +1,558 @@
+---
+title: "Clustering and Classification with K-Means and K-Nearest Neighbors"
+author: "Kuan-Ling (Rebecca) Tseng"
+date: today
+---
+
+This report details the from-scratch implementation and evaluation of two key machine learning models: K-Means clustering and K-Nearest Neighbors (KNN) classification.
+
+The analysis demonstrates that a custom K-Means model can effectively identify natural groupings in the Palmer Penguins dataset, with performance metrics guiding us to the optimal number of clusters. For classification, the hand-coded KNN model successfully navigated a challenging, non-linear dataset, and identified its most accurate configuration. In both cases, the custom models were benchmarked against industry-standard libraries, confirming their effectiveness and providing practical insight into how these algorithms function.
+
+## K-Means
+
+In this section, I explore the use of K-Means clustering to identify underlying structure within the Palmer Penguins dataset. K-Means is an unsupervised learning algorithm that partitions data into k groups by minimizing the distance between data points and their assigned cluster centroids. It is widely used for pattern discovery, customer segmentation, and dimensionality reduction.
+
+I first implement K-Means from scratch, looking deeply into the clustering process and visualization of centroid updates. I then compare this hand-coded implementation with the built-in KMeans function from scikit-learn to evaluate consistency and performance across various numbers of clusters (k ranging from 3 to 7).
+
+The dataset includes 333 observations of penguins from different species, and I focus on two key numeric features, `bill length` and `flipper length` to perform clustering. 
+
+- Bill Length ranges from 32.1 mm to 59.6 mm, with a mean of 44 mm and a standard deviation of approximately 5.5 mm.
+
+- Flipper Length ranges from 172 mm to 231 mm, with a mean of 201 mm and a standard deviation of about 14.02 mm.
+
+The results are visualized side-by-side to compare clustering outcomes, and I further assess clustering quality using two key metrics: Within-Cluster Sum of Squares (WCSS) and Silhouette Score.
+
+This analysis demonstrates both the mechanics and interpretability of K-Means clustering, and concludes by identifying the most appropriate number of clusters for the data.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+import pandas as pd
+
+penguin = pd.read_csv("../../data/palmer_penguins.csv")
+penguin.head()
+```
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+penguin[["bill_length_mm", "flipper_length_mm"]].describe().round(1)
+```
+The boxplot above illustrates the distributions of bill length and flipper length among the 333 penguins in the dataset. This visualization helps us understand the range and variability of the two features selected for clustering.
+
+- Bill Length (mm):
+The interquartile range (IQR) spans approximately from 39.5 mm to 48.6 mm, with a median around 44.5 mm. The values are fairly symmetric, and there are no obvious outliers. This indicates a relatively balanced distribution of bill sizes across species.
+
+- Flipper Length (mm):
+The flipper length shows a wider IQR (190 mm to 213 mm), with a higher median near 197 mm. The whiskers extend from about 172 mm to 231 mm, suggesting greater variability in flipper length compared to bill length. A few values appear close to the upper whisker, but no extreme outliers are visible.
+
+From this plot, it is evident that flipper length has a larger spread than bill length, which may contribute more to the cluster separation in K-Means. Since these features are on different scales, standardization was applied prior to clustering to ensure both variables contribute equally to the distance calculations.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 6))
+plt.boxplot(
+    [penguin["bill_length_mm"].dropna(), penguin["flipper_length_mm"].dropna()],
+    labels=["Bill Length", "Flipper Length"],
+)
+plt.title("Boxplot of Bill Length and Flipper Length")
+plt.ylabel("Measurement (mm)")
+plt.grid(True)
+plt.show()
+```
+
+**Form K-means algorithm.**
+
+The goal for K-means is to minimize the variance within each cluster by repeatedly updating the cluster centroids and reassigning data points. The core steps are as follows:
+
+1. Initialization: Randomly select k data points as the initial centroids.
+1. Assignment Step: Assign each data point to the nearest centroid using a distance metric (e.g., Euclidean distance).
+1. Update Step: For each cluster, compute the new centroid as the mean of all assigned points.
+1. Convergence Check: Repeat steps 2 and 3 until centroids stop changing (i.e., convergence) or a maximum number of iterations is reached.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+import numpy as np
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+penguin_scaler = scaler.fit_transform(
+    penguin[["bill_length_mm", "flipper_length_mm"]].dropna()
+)
+
+
+def calculate_distances(point, centroids):
+    return np.sqrt(np.sum((point - centroids) ** 2, axis=1))
+
+
+def kmeans_scratch(data, k, max_iterations=10, plot_steps=False):
+    initial_indices = np.random.choice(data.shape[0], k, replace=False)
+    centroids = data[initial_indices, :]
+    assignments = np.zeros(data.shape[0], dtype=int)
+    centroid_history = [centroids.copy()]
+
+    for i in range(max_iterations):
+        for point_idx in range(data.shape[0]):
+            distances = calculate_distances(data[point_idx, :], centroids)
+            assignments[point_idx] = np.argmin(distances)
+
+        old_centroids = np.copy(centroids)
+
+        for cluster_idx in range(k):
+            points_in_cluster = data[assignments == cluster_idx]
+            if len(points_in_cluster) > 0:
+                centroids[cluster_idx, :] = points_in_cluster.mean(axis=0)
+
+        centroid_history.append(centroids.copy())
+
+        if plot_steps:
+            plot_clusters(data, assignments, centroids)
+
+        if np.allclose(centroids, old_centroids):
+            break
+
+    return assignments, centroids, centroid_history
+```
+
+**Visualize K-means process.**
+
+The plot above illustrates how the centroids move during the K-Means clustering process. Each data point is colored according to its final cluster assignment, and the gray paths trace the path of each centroid from initialization to convergence.
+
+Key observations:
+
+- The centroids begin at random positions, and with each iteration, they shift toward the center of their assigned clusters.
+- The movement path shows how the centroids gradually stabilize (the lengths between the previous point and the next point get smaller), eventually reaching a fixed position once the assignments stop changing.
+- The final centroid positions are marked in red Xs, while the gray dots and lines represent the centroid positions from earlier iterations.
+- The fact that each centroid path settles into a well-separated region confirms that the clustering process has converged and that the chosen features (bill length and flipper length) provide meaningful segmentation.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+def plot_centroid_movement(X, labels, centroid_history):
+    k = len(np.unique(labels))
+    final_centroids = centroid_history[-1]
+
+    plt.figure(figsize=(8, 6))
+    for i in range(k):
+        plt.scatter(X[labels == i, 0], X[labels == i, 1], label=f"Cluster {i}")
+    
+    for cluster_idx in range(k):
+        path = [cent[cluster_idx] for cent in centroid_history]
+        path = np.array(path)
+        plt.plot(path[:, 0], path[:, 1], marker='o', linestyle='-', color='grey')
+    
+    plt.scatter(final_centroids[:, 0], final_centroids[:, 1], c='red', marker='X', s=100, label='Final Centroids')
+    plt.xlabel("Scaled Bill Length")
+    plt.ylabel("Scaled Flipper Length")
+    plt.title("Centroid Movement Over Iterations")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+assignments, centroids, history = kmeans_scratch(penguin_scaler, k=3)
+plot_centroid_movement(penguin_scaler, assignments, history)
+
+```
+
+
+```{python}
+
+# | code-fold: true
+# | code-summary: "Code"
+
+#create a function for visualizing k-means process
+
+def plot_clusters(ax, X, labels, centroids, title="K-means visualization"):
+    for i in range(np.max(labels) + 1):
+        ax.scatter(X[labels == i, 0], X[labels == i, 1], label=f"Cluster {i}")
+    ax.scatter(
+        centroids[:, 0],
+        centroids[:, 1],
+        c="black",
+        marker="x",
+        s=100,
+        label="Centroids",
+    )
+    ax.set_xlabel("Scaled Bill Length")
+    ax.set_ylabel("Scaled Flipper Length")
+    ax.set_title(title)
+    ax.grid(True)
+    ax.legend()
+
+```
+
+**Comparison of Scratch vs Built-in KMeans for Varying Cluster Counts (k=3 to 7)**
+
+Next, let's call out the built-in k-means function and compare the plots formed by the two methods.
+
+The series of plots below present side-by-side comparisons between a hand-scripted K-Means algorithm and the built-in scikit-learn KMeans function. For each value of k (from 3 to 7), the left subplot shows the results from the scratch implementation, while the right subplot displays those from the built-in model.
+
+Key observations:
+
+- General Consistency: Across all values of k, the two implementations produce highly similar clustering results. This consistency validates the correctness of the scratch implementation.
+
+- Centroid Positions: The centroids (black “X”) appear in near-identical locations between both models, indicating that both optimization procedures converge similarly.
+
+- Differences among different k values: As k increases, the distribution of clusters become more intense. For example, at k=5 and k=6, distinct subgroups emerge within previously larger clusters, and the variance within each group becomes smaller. Though it might be easier to categorize points since they involve more similarity, setting a threshold for k is necessary because by k=7, clusters begin to overlap and show diminishing returns in interpretability, suggesting potential over-segmentation.
+
+These comparisons demonstrate the importance of choosing an appropriate value of k. While higher values may better fit the data, they can also lead to redundant or noisy clusters. To address this, the next section evaluates cluster quality using WCSS and Silhouette Score metrics.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+from sklearn.cluster import KMeans
+
+for k in [3, 4, 5, 6, 7]:
+    assignments, centroids, history = kmeans_scratch(penguin_scaler, k=k)
+
+    kmeans = KMeans(n_clusters=k, random_state=0)
+    kmeans_labels = kmeans.fit_predict(penguin_scaler)
+    kmeans_centroids = kmeans.cluster_centers_
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    plot_clusters(
+        axes[0], penguin_scaler, assignments, centroids, title=f"Scratch KMeans (k={k})"
+    )
+    plot_clusters(
+        axes[1],
+        penguin_scaler,
+        kmeans_labels,
+        kmeans_centroids,
+        title=f"Built-in KMeans (k={k})",
+    )
+
+    plt.suptitle(f"Comparison of KMeans with k = {k}", fontsize=16)
+    plt.tight_layout()
+    plt.show()
+```
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+import os
+
+os.makedirs("kmeans_frames", exist_ok=True)
+
+k_values = range(2, 8)
+for k in k_values:
+    kmeans = KMeans(n_clusters=k, random_state=0)
+    labels = kmeans.fit_predict(penguin_scaler)
+    centroids = kmeans.cluster_centers_
+
+    plt.figure(figsize=(14, 10))
+    for i in range(k):
+        plt.scatter(
+            penguin_scaler[labels == i, 0],
+            penguin_scaler[labels == i, 1],
+            label=f"Cluster {i}",
+            s=60,
+        )
+    plt.scatter(
+        centroids[:, 0],
+        centroids[:, 1],
+        c="black",
+        marker="x",
+        s=100,
+        label="Centroids",
+    )
+    plt.title(f"K-Means Clustering (k = {k})", fontsize=20)
+    plt.xlabel("Scaled Bill Length", fontsize=20)
+    plt.ylabel("Scaled Flipper Length", fontsize=20)
+    plt.legend(fontsize=20)
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.savefig(f"kmeans_frames/kmeans_k{k}.png")
+    plt.close()
+```
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+import imageio.v2 as imageio
+
+images = []
+for k in k_values:
+    filename = f"kmeans_frames/kmeans_k{k}.png"
+    images.append(imageio.imread(filename))
+
+imageio.mimsave("kmeans_animation.gif", images, duration=3, loop=0)
+```
+
+This animation shows how the clustering pattern evolves as we vary the number of clusters from 2 to 7:
+
+![](kmeans_animation.gif)
+
+
+**Evaluating the Optimal Number of Clusters with WCSS and Silhouette Score**
+
+1. Within-Cluster Sum of Squares (WCSS)
+
+The WCSS plot (left) shows the total variance within each cluster as k increases. As expected, WCSS decreases with larger k because more clusters lead to tighter groupings. However, the rate of decrease slows significantly after k = 3, forming an “elbow” shape. This suggests that k = 3 is a reasonable balance between model complexity and compact clusters.
+
+2. Silhouette Score
+
+The Silhouette Score plot (right) provides a measure of how well-separated the clusters are. A higher score indicates more distinct and well-defined clusters. Here, the score peaks at k = 2, but remains relatively high at k = 3 and k = 4. After k = 4, the score drops, indicating that additional clusters begin to overlap or fragment the data unnaturally.
+
+Taking both metrics into account, k = 3 offers the best trade-off between simplicity, separation, and compactness. It corresponds to a clear elbow in WCSS and a high Silhouette Score, supporting its use in subsequent clustering analysis.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+from sklearn.metrics import silhouette_score
+
+wcss = []
+silhouette_scores = []
+k_values = range(2, 8)
+
+for k in k_values:
+    kmeans = KMeans(n_clusters=k, random_state=0)
+    labels = kmeans.fit_predict(penguin_scaler)
+
+    wcss.append(kmeans.inertia_)
+
+    score = silhouette_score(penguin_scaler, labels)
+    silhouette_scores.append(score)
+
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.plot(k_values, wcss, marker="o")
+plt.title("WCSS")
+plt.xlabel("Number of Clusters (k)")
+plt.ylabel("WCSS")
+plt.grid(True)
+
+plt.subplot(1, 2, 2)
+plt.plot(k_values, silhouette_scores, marker="o")
+plt.title("Silhouette Score")
+plt.xlabel("Number of Clusters (k)")
+plt.ylabel("Silhouette Score")
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()
+```
+
+## K Nearest Neighbors
+
+In this section, I explore the K-Nearest Neighbors (KNN) classification algorithm, using a dataset containing two numeric features, x1 and x2, and a binary outcome variable y, which is determined by whether a point lies above or below a non-linear, wiggly boundary.
+
+The analysis consists of the following key steps:
+
+1. Data Generation: A training and testing dataset are generated using different random seeds, ensuring the test set provides an unbiased evaluation.
+
+1. Visualization: The synthetic data is visualized, highlighting the boundary and class distribution, which provides insight into the complexity of the classification task.
+
+1. Hand-coded KNN Implementation: I implement the KNN algorithm from scratch to classify test observations and compare the results with scikit-learn’s built-in KNeighborsClassifier.
+
+1. Model Evaluation: Test accuracy is computed across a range of k values (from 1 to 30), and the results are plotted to determine the optimal number of neighbors for classification.
+
+1. Feature Importance: A simple neural network (MLPClassifier) is trained and evaluated using permutation-based variable importance, providing interpretability on which features contribute more to the classification decision.
+
+**Generate Train Data**
+
+First, I generated a synthetic dataset with 100 observations, where each point is defined by two features, x1 and x2, randomly sampled from a uniform distribution between -3 and 3. The binary target variable y is assigned based on whether each point lies above or below a non-linear boundary defined by the function:
+$$ sin(4x_1) + x_1 $$
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+np.random.seed(42)
+n = 100
+
+x1 = np.random.uniform(-3, 3, size=n)
+x2 = np.random.uniform(-3, 3, size=n)
+
+boundary = np.sin(4 * x1) + x1
+
+y = pd.Series((x2 > boundary).astype(int), dtype="category")
+
+dat = pd.DataFrame({"x1": x1, "x2": x2, "y": y})
+```
+
+**Visualization of Synthetic Classification Data**
+The scatter plot below displays a synthetic dataset generated for testing K-Nearest Neighbors algorithm. Each point is colored by its binary label y, which is determined by its position relative to the dashed curve.
+
+The black dashed line represents the non-linear decision boundary, defined by the function sin(4x_1) + x_1. Points above the boundary are labeled as class 1 (red), while points below are labeled as class 0 (blue). This “wiggly” boundary creates a complex separation structure that is challenging for linear classifiers, making it ideal for evaluating non-parametric models like KNN.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+plt.figure(figsize=(8, 6))
+palette = {0: "skyblue", 1: "salmon"}
+sns.scatterplot(data=dat, x="x1", y="x2", hue="y", palette=palette, s=60, edgecolor="k")
+
+# Optionally plot the wiggly boundary
+x1_grid = np.linspace(-3, 3, 300)
+boundary_curve = np.sin(4 * x1_grid) + x1_grid
+plt.plot(x1_grid, boundary_curve, color="black", linestyle="--", label="Boundary")
+
+plt.xlabel("x1")
+plt.ylabel("x2")
+plt.title("Synthetic Data with Wiggly Boundary")
+plt.legend(title="y")
+plt.grid(True)
+plt.show()
+```
+
+**Generate Test Data**
+
+Then, I generated a test dataset with 100 observations, using the same method for the train dataset above.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+np.random.seed(82)
+n_test = 100
+
+x1_test = np.random.uniform(-3, 3, size=n_test)
+x2_test = np.random.uniform(-3, 3, size=n_test)
+
+boundary_test = np.sin(4 * x1_test) + x1_test
+
+y_test = pd.Series((x2_test > boundary_test).astype(int), dtype="category")
+
+test_dat = pd.DataFrame({"x1": x1_test, "x2": x2_test, "y": y_test})
+```
+
+**Script K-Nearest Neighbors and Built-in KNeighborsClassifier**
+
+For the hand-implemented KNN, I followed the process below:
+
+1. For each test point, calculate the Euclidean distance to all training points using the euclidean_distance() helper function.
+
+1. Identifies the k closest neighbors (smallest distances) using np.argsort().
+
+1. The function extracts the labels of the nearest neighbors and uses collections to determine the most frequent class label, which becomes the prediction for that point.
+
+The results from the scripted and the built-in KNN functions when k was set to 5 are the same, with the accuracy of 0.91.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+from collections import Counter
+from sklearn.neighbors import KNeighborsClassifier
+
+def euclidean_distance(a, b):
+    return np.sqrt(np.sum((a - b) ** 2, axis=1))
+
+def knn_predict(X_train, y_train, X_test, k):
+    preds = []
+    for test_point in X_test:
+        distances = euclidean_distance(X_train, test_point)
+        nearest_indices = np.argsort(distances)[:k]
+        nearest_labels = y_train.iloc[nearest_indices]
+        most_common = Counter(nearest_labels).most_common(1)[0][0]
+        preds.append(most_common)
+    return np.array(preds)
+
+X_train = dat[["x1", "x2"]].values
+y_train = dat["y"]
+X_test = test_dat[["x1", "x2"]].values
+y_test = test_dat["y"]
+
+# k=5
+y_pred_hand = knn_predict(X_train, y_train, X_test, k=5)
+accuracy_hand = np.mean(y_pred_hand == y_test.astype(int))
+print(f"Hand-coded KNN accuracy (k=5): {accuracy_hand:.2f}")
+
+# Built-in KNN
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+y_pred_builtin = knn.predict(X_test)
+accuracy_builtin = np.mean(y_pred_builtin == y_test)
+print(f"Built-in KNN accuracy (k=5): {accuracy_builtin:.2f}")
+```
+
+I, then, evaluated the test classification accuracy for values of k ranging from 1 to 30. The line chart visualizes the relationship between number of neighbors (k) and test accuracy (%). Each point on the curve represents the classification performance using a specific k.
+
+- Accuracy fluctuates noticeably at lower k, indicating sensitivity to local noise when fewer neighbors are considered.
+
+- The highest accuracy occurs at k = 4, reaching approximately 94%, suggesting this is the most effective balance between underfitting and overfitting for this dataset.
+
+- Beyond k = 6, the performance stabilizes but remains slightly lower, indicating diminishing returns from including more neighbors.
+
+Therefore, a relatively small number of neighbors (around 3–5) is most effective for this synthetic classification task. This aligns with the underlying structure of the data, where decision boundaries are highly localized and non-linear.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+accuracies = []
+k_range = range(1, 31)
+
+for k in k_range:
+    y_pred = knn_predict(X_train, y_train, X_test, k)
+    acc = np.mean(y_pred == y_test.astype(int))
+    accuracies.append(acc * 100) 
+
+plt.figure(figsize=(10, 6))
+plt.plot(k_range, accuracies, marker="o")
+plt.xlabel("k (Number of Neighbors)")
+plt.ylabel("Accuracy (%)")
+plt.title("KNN Test Accuracy vs. k")
+plt.grid(True)
+plt.xticks(k_range)
+plt.show()
+
+optimal_k = k_range[np.argmax(accuracies)]
+print(f"Optimal k: {optimal_k} with accuracy {max(accuracies):.2f}%")
+```
+
+**Assess feature importance utilizingNeural Network and Permutation Method**
+
+In here, I trained a Multi-Layer Perceptron (MLP) classifier on the training data and computed permutation-based feature importance on the test set.
+
+Permutation importance measures how much a model’s prediction accuracy decreases when the values of a specific feature are randomly shuffled. A greater drop in accuracy indicates that the feature is more important for the model’s decision-making process.
+
+- x2 (0.263) appears slightly more influential than x1 (0.231) in determining the output class.
+
+- This result is consistent with the dataset’s structure, where the vertical axis (x2) directly determines class membership relative to a non-linear boundary.
+
+This interpretability step confirms that the model is capturing the structure we embedded in the synthetic data generation process.
+
+```{python}
+# | code-fold: true
+# | code-summary: "Code"
+
+from sklearn.inspection import permutation_importance
+from sklearn.neural_network import MLPClassifier
+
+mlp = MLPClassifier(hidden_layer_sizes=(10,), max_iter=1000, random_state=42)
+mlp.fit(X_train, y_train)
+perm_importance = permutation_importance(
+    mlp, X_test, y_test, n_repeats=30, random_state=42
+)
+mlp_importances = perm_importance.importances_mean
+
+# Combine results in a table
+importances_df = pd.DataFrame(
+    {
+        "Feature": ["x1", "x2"],
+        "Neural Net Permutation Importance": mlp_importances,
+    }
+)
+
+print(importances_df)
+```
+
+
+
