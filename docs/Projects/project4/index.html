@@ -236,7 +236,7 @@ window.Quarto = {
 </ul>
 <p>The results are visualized side-by-side to compare clustering outcomes, and I further assess clustering quality using two key metrics: Within-Cluster Sum of Squares (WCSS) and Silhouette Score.</p>
 <p>This analysis demonstrates both the mechanics and interpretability of K-Means clustering, and concludes by identifying the most appropriate number of clusters for the data.</p>
-<div id="96b954ca" class="cell" data-execution_count="1">
+<div id="1a3e8201" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -244,7 +244,7 @@ window.Quarto = {
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>penguin <span class="op">=</span> pd.read_csv(<span class="st">"../../data/palmer_penguins.csv"</span>)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>penguin.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="388">
+<div class="cell-output cell-output-display" data-execution_count="1">
 <div>
 
 
@@ -324,12 +324,12 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="15e268f8" class="cell" data-execution_count="2">
+<div id="ec22bf1d" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>penguin[[<span class="st">"bill_length_mm"</span>, <span class="st">"flipper_length_mm"</span>]].describe().<span class="bu">round</span>(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
-<div class="cell-output cell-output-display" data-execution_count="389">
+<div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
 
@@ -388,13 +388,13 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>The boxplot above illustrates the distributions of bill length and flipper length among the 333 penguins in the dataset. This visualization helps us understand the range and variability of the two features selected for clustering.</p>
+<p>The boxplot below illustrates the distributions of bill length and flipper length among the 333 penguins in the dataset. This visualization helps us understand the range and variability of the two features selected for clustering.</p>
 <ul>
-<li><p>Bill Length (mm): The interquartile range (IQR) spans approximately from 39.5 mm to 48.6 mm, with a median around 44.5 mm. The values are fairly symmetric, and there are no obvious outliers. This indicates a relatively balanced distribution of bill sizes across species.</p></li>
+<li><p>Bill Length (mm): The IQR spans approximately from 39.5 mm to 48.6 mm, with a median around 44.5 mm. The values are fairly symmetric, and there are no obvious outliers. This indicates a relatively balanced distribution of bill sizes across species.</p></li>
 <li><p>Flipper Length (mm): The flipper length shows a wider IQR (190 mm to 213 mm), with a higher median near 197 mm. The whiskers extend from about 172 mm to 231 mm, suggesting greater variability in flipper length compared to bill length. A few values appear close to the upper whisker, but no extreme outliers are visible.</p></li>
 </ul>
 <p>From this plot, it is evident that flipper length has a larger spread than bill length, which may contribute more to the cluster separation in K-Means. Since these features are on different scales, standardization was applied prior to clustering to ensure both variables contribute equally to the distance calculations.</p>
-<div id="f12ffa79" class="cell" data-execution_count="3">
+<div id="da7d13d2" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -410,7 +410,7 @@ window.Quarto = {
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/h1/b4r0547s2hs1p4mxjsk9f3z40000gn/T/ipykernel_31442/345939734.py:4: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
+<pre><code>/var/folders/h1/b4r0547s2hs1p4mxjsk9f3z40000gn/T/ipykernel_47965/345939734.py:4: MatplotlibDeprecationWarning: The 'labels' parameter of boxplot() has been renamed 'tick_labels' since Matplotlib 3.9; support for the old name will be dropped in 3.11.
   plt.boxplot(</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -429,7 +429,7 @@ window.Quarto = {
 <li>Update Step: For each cluster, compute the new centroid as the mean of all assigned points.</li>
 <li>Convergence Check: Repeat steps 2 and 3 until centroids stop changing (i.e., convergence) or a maximum number of iterations is reached.</li>
 </ol>
-<div id="6f7847b1" class="cell" data-execution_count="4">
+<div id="1775c826" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -476,15 +476,14 @@ window.Quarto = {
 </details>
 </div>
 <p><strong>Visualize K-means process.</strong></p>
-<p>The plot above illustrates how the centroids move during the K-Means clustering process. Each data point is colored according to its final cluster assignment, and the gray paths trace the path of each centroid from initialization to convergence.</p>
-<p>Key observations:</p>
+<p>The plot below illustrates how the centroids move during the K-Means clustering process. Each data point is colored according to its final cluster assignment, and the gray paths trace the path of each centroid from initialization to convergence.</p>
 <ul>
 <li>The centroids begin at random positions, and with each iteration, they shift toward the center of their assigned clusters.</li>
 <li>The movement path shows how the centroids gradually stabilize (the lengths between the previous point and the next point get smaller), eventually reaching a fixed position once the assignments stop changing.</li>
 <li>The final centroid positions are marked in red Xs, while the gray dots and lines represent the centroid positions from earlier iterations.</li>
-<li>The fact that each centroid path settles into a well-separated region confirms that the clustering process has converged and that the chosen features (bill length and flipper length) provide meaningful segmentation.</li>
+<li>The fact that each centroid path settles into a well-separated region confirms that the clustering process has converged and that the chosen features (<code>bill length</code> and <code>flipper length</code>) provide meaningful segmentation.</li>
 </ul>
-<div id="a3be5563" class="cell" data-execution_count="5">
+<div id="d0a7f322" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_centroid_movement(X, labels, centroid_history):</span>
@@ -519,7 +518,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="79a403fe" class="cell" data-execution_count="6">
+<div id="957b2334" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#create a function for visualizing k-means process</span></span>
@@ -545,14 +544,13 @@ window.Quarto = {
 <p><strong>Comparison of Scratch vs Built-in KMeans for Varying Cluster Counts (k=3 to 7)</strong></p>
 <p>Next, let’s call out the built-in k-means function and compare the plots formed by the two methods.</p>
 <p>The series of plots below present side-by-side comparisons between a hand-scripted K-Means algorithm and the built-in scikit-learn KMeans function. For each value of k (from 3 to 7), the left subplot shows the results from the scratch implementation, while the right subplot displays those from the built-in model.</p>
-<p>Key observations:</p>
 <ul>
 <li><p>General Consistency: Across all values of k, the two implementations produce highly similar clustering results. This consistency validates the correctness of the scratch implementation.</p></li>
 <li><p>Centroid Positions: The centroids (black “X”) appear in near-identical locations between both models, indicating that both optimization procedures converge similarly.</p></li>
-<li><p>Differences among different k values: As k increases, the distribution of clusters become more intense. For example, at k=5 and k=6, distinct subgroups emerge within previously larger clusters, and the variance within each group becomes smaller. Though it might be easier to categorize points since they involve more similarity, setting a threshold for k is necessary because by k=7, clusters begin to overlap and show diminishing returns in interpretability, suggesting potential over-segmentation.</p></li>
+<li><p>Differences among various k values: As k increases, the distribution of clusters become more intense. For example, at k=5 and k=6, distinct subgroups emerge within previously larger clusters, and the variance within each group becomes smaller. Though it might be easier to categorize points since they involve more similarity, setting a threshold for k is necessary because by k=7, clusters begin to overlap and show diminishing returns in interpretability, suggesting potential over-segmentation.</p></li>
 </ul>
 <p>These comparisons demonstrate the importance of choosing an appropriate value of k. While higher values may better fit the data, they can also lead to redundant or noisy clusters. To address this, the next section evaluates cluster quality using WCSS and Silhouette Score metrics.</p>
-<div id="90399212" class="cell" data-execution_count="7">
+<div id="c80efdcb" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.cluster <span class="im">import</span> KMeans</span>
@@ -616,7 +614,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="4ba61dd0" class="cell" data-execution_count="8">
+<div id="455f93d3" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
@@ -656,7 +654,7 @@ window.Quarto = {
 <span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    plt.close()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="19199162" class="cell" data-execution_count="9">
+<div id="5497ff95" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> imageio.v2 <span class="im">as</span> imageio</span>
@@ -669,19 +667,19 @@ window.Quarto = {
 <span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>imageio.mimsave(<span class="st">"kmeans_animation.gif"</span>, images, duration<span class="op">=</span><span class="dv">3</span>, loop<span class="op">=</span><span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>This animation shows how the clustering pattern evolves as we vary the number of clusters from 2 to 7:</p>
+<p>This animation below shows how the clustering pattern evolves as we vary the number of clusters from 2 to 7:</p>
 <p><img src="kmeans_animation.gif" class="img-fluid"></p>
 <p><strong>Evaluating the Optimal Number of Clusters with WCSS and Silhouette Score</strong></p>
 <ol type="1">
 <li>Within-Cluster Sum of Squares (WCSS)</li>
 </ol>
-<p>The WCSS plot (left) shows the total variance within each cluster as k increases. As expected, WCSS decreases with larger k because more clusters lead to tighter groupings. However, the rate of decrease slows significantly after k = 3, forming an “elbow” shape. This suggests that k = 3 is a reasonable balance between model complexity and compact clusters.</p>
+<p>The WCSS plot (left) shows the total variance within each cluster as k increases. WCSS decreases with larger k because more clusters lead to tighter groupings. However, the rate of decrease slows significantly after k = 3, forming an “elbow” shape. This suggests that k = 3 is a reasonable balance between model complexity and compact clusters.</p>
 <ol start="2" type="1">
 <li>Silhouette Score</li>
 </ol>
-<p>The Silhouette Score plot (right) provides a measure of how well-separated the clusters are. A higher score indicates more distinct and well-defined clusters. Here, the score peaks at k = 2, but remains relatively high at k = 3 and k = 4. After k = 4, the score drops, indicating that additional clusters begin to overlap or fragment the data unnaturally.</p>
-<p>Taking both metrics into account, k = 3 offers the best trade-off between simplicity, separation, and compactness. It corresponds to a clear elbow in WCSS and a high Silhouette Score, supporting its use in subsequent clustering analysis.</p>
-<div id="7e072a91" class="cell" data-execution_count="10">
+<p>The Silhouette Score plot (right) provides a measure of how well-separated the clusters are. A higher score indicates more distinct and well-defined clusters. The score peaks is at k = 2 here, but remains relatively high at k = 3 and k = 4. After k = 4, the score drops, indicating that additional clusters begin to overlap or fragment the data unnaturally.</p>
+<p>Taking both metrics into account, k = 3 offers the best trade-off between simplicity, separation, and compactness.</p>
+<div id="d1823d8b" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> silhouette_score</span>
@@ -740,7 +738,7 @@ window.Quarto = {
 </ol>
 <p><strong>Generate Train Data</strong></p>
 <p>First, I generated a synthetic dataset with 100 observations, where each point is defined by two features, x1 and x2, randomly sampled from a uniform distribution between -3 and 3. The binary target variable y is assigned based on whether each point lies above or below a non-linear boundary defined by the function: <span class="math display">\[ sin(4x_1) + x_1 \]</span></p>
-<div id="909b37e3" class="cell" data-execution_count="11">
+<div id="3ce1d554" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
@@ -756,9 +754,10 @@ window.Quarto = {
 <span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>dat <span class="op">=</span> pd.DataFrame({<span class="st">"x1"</span>: x1, <span class="st">"x2"</span>: x2, <span class="st">"y"</span>: y})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p><strong>Visualization of Synthetic Classification Data</strong> The scatter plot below displays a synthetic dataset generated for testing K-Nearest Neighbors algorithm. Each point is colored by its binary label y, which is determined by its position relative to the dashed curve.</p>
+<p><strong>Visualization of Synthetic Classification Data</strong></p>
+<p>The scatter plot below displays the distribution of the synthetic dataset generated for testing K-Nearest Neighbors algorithm. Each point is colored by its binary label y, which is determined by its position relative to the dashed curve.</p>
 <p>The black dashed line represents the non-linear decision boundary, defined by the function sin(4x_1) + x_1. Points above the boundary are labeled as class 1 (red), while points below are labeled as class 0 (blue). This “wiggly” boundary creates a complex separation structure that is challenging for linear classifiers, making it ideal for evaluating non-parametric models like KNN.</p>
-<div id="7e67fc2f" class="cell" data-execution_count="12">
+<div id="e5c9d4cf" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
@@ -787,7 +786,7 @@ window.Quarto = {
 </div>
 <p><strong>Generate Test Data</strong></p>
 <p>Then, I generated a test dataset with 100 observations, using the same method for the train dataset above.</p>
-<div id="be71f94b" class="cell" data-execution_count="13">
+<div id="49c5168b" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">82</span>)</span>
@@ -810,8 +809,8 @@ window.Quarto = {
 <li><p>Identifies the k closest neighbors (smallest distances) using np.argsort().</p></li>
 <li><p>The function extracts the labels of the nearest neighbors and uses collections to determine the most frequent class label, which becomes the prediction for that point.</p></li>
 </ol>
-<p>The results from the scripted and the built-in KNN functions when k was set to 5 are the same, with the accuracy of 0.91.</p>
-<div id="cc000203" class="cell" data-execution_count="14">
+<p>When I tested the scripted and the built-in KNN functions with k setting as 5, the results were the same, with the accuracy of 0.91.</p>
+<div id="50d175ff" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
@@ -852,14 +851,14 @@ window.Quarto = {
 Built-in KNN accuracy (k=5): 0.91</code></pre>
 </div>
 </div>
-<p>I, then, evaluated the test classification accuracy for values of k ranging from 1 to 30. The line chart visualizes the relationship between number of neighbors (k) and test accuracy (%). Each point on the curve represents the classification performance using a specific k.</p>
+<p>Then, I evaluated the test classification accuracy for values of k ranging from 1 to 30. The line chart visualizes the relationship between number of neighbors (k) and test accuracy (%). Each point on the curve represents the classification performance using a specific k.</p>
 <ul>
 <li><p>Accuracy fluctuates noticeably at lower k, indicating sensitivity to local noise when fewer neighbors are considered.</p></li>
 <li><p>The highest accuracy occurs at k = 4, reaching approximately 94%, suggesting this is the most effective balance between underfitting and overfitting for this dataset.</p></li>
 <li><p>Beyond k = 6, the performance stabilizes but remains slightly lower, indicating diminishing returns from including more neighbors.</p></li>
 </ul>
 <p>Therefore, a relatively small number of neighbors (around 3–5) is most effective for this synthetic classification task. This aligns with the underlying structure of the data, where decision boundaries are highly localized and non-linear.</p>
-<div id="25981108" class="cell" data-execution_count="15">
+<div id="a05c6595" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>accuracies <span class="op">=</span> []</span>
@@ -901,7 +900,7 @@ Built-in KNN accuracy (k=5): 0.91</code></pre>
 <li><p>This result is consistent with the dataset’s structure, where the vertical axis (x2) directly determines class membership relative to a non-linear boundary.</p></li>
 </ul>
 <p>This interpretability step confirms that the model is capturing the structure we embedded in the synthetic data generation process.</p>
-<div id="59deafd5" class="cell" data-execution_count="16">
+<div id="65ec1b27" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.inspection <span class="im">import</span> permutation_importance</span>
